@@ -1,1 +1,5 @@
-benchmaskweb
+# benchmaskweb
+```
+docker-compose up
+```
+
