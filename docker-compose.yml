@@ -1,0 +1,52 @@
+version: "3"
+services:
+  mongo:
+    image: mongo
+    privileged: true
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./docker_mongo/db:/data/db"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+
+  flask:
+    build: ./docker_python
+    ports:
+      - "7000:5000"
+    volumes:
+      - "./docker_python:/usr/src/app"
+    command: gunicorn -w 4 -b 0.0.0.0:5000 -k 'gevent' --reload flask_echo:app
+    depends_on:
+      - mongo
+
+  # tornado:
+  #   build: ./docker_python
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - "./docker_python:/usr/src/app"
+  #   command: python tonado_echo.py
+  #   depends_on:
+  #     - mongo
+
+  koa:
+    build: ./docker_nodejs
+    ports:
+      - "7001:3000"
+    volumes:
+      - "./docker_nodejs:/usr/src/app"
+    command: yarn dev
+    depends_on:
+      - mongo
+
+  gin:
+    build: ./docker_golang
+    ports:
+      - "7002:8080"
+    volumes:
+      - "./docker_golang:/usr/src/app"
+    command: go run gin_echo.go
+    depends_on:
+      - mongo
